@@ -202,7 +202,7 @@ server <- function(input, output, session) {
     # Function that UPDATE DATA for plot on site EDA + Sah
     
     # print(length(df$time_stamps))
-    print(df$moveEC-1)
+    # print(df$moveEC-1)
     if (length(df$time_stamps) < (df$moveEC-1)) {
       t1 <- df$time_stamps[length(df$time_stamps)]  
     } else {
@@ -224,13 +224,13 @@ server <- function(input, output, session) {
     if(a != 0){
 
       difference <- as.integer(as.integer(seconds(t1)) - as.integer(t[indeks]))
-      print(difference)
+      # print(difference)
       indeks <- indeks + (difference * 4) 
       df$indeks <- indeks 
     }
     
-    print(t[indeks])
-    print(t1)
+    # print(t[indeks])
+    # print(t1)
     df$ec_plot <- df$ec[(df$indeks-240):(df$indeks+240),] # We always take [-240 to 240] from the move
     
     
