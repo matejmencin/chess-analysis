@@ -83,6 +83,25 @@ ui <- navbarPage(theme = shinytheme("simplex"),"Navigacija",
              )
     ),
     
+    tabPanel("Preveri srcni utrip",
+             # Main panel
+             verticalLayout(
+               titlePanel("Preveri srcni utrip"),
+               plotOutput("plotHR"),
+               wellPanel(
+                 sliderInput("time_hr", 
+                             label = h3("Cas"), 
+                             min = as.POSIXct("15:00", format = "%H:%M"), 
+                             max = as.POSIXct("23:00", format = "%H:%M"), 
+                             value = c(as.POSIXct("17:15", format = "%H:%M"), 
+                                       as.POSIXct("17:15", format = "%H:%M")),
+                             timeFormat = "%H:%M"),
+                 actionButton("update_hr", align="center", "Osvezi pogled")
+               )
+             )
+    ),
+    
+    
     
     # Chess ----
     tabPanel("Sah",
@@ -165,7 +184,7 @@ server <- function(input, output, session) {
     eda = NULL, temp = NULL, eda_plot = NULL, temp_plot = NULL,
     ec_plot = NULL, ec=NULL, playEC = NULL, moveEC = NULL, 
     time_stamps = NULL, day = NULL, month = NULL, year = NULL,
-    indeks = NULL) 
+    indeks = NULL, hr = NULL, hr_plot = NULL) 
 
   # [S] Functions used in server.func ----
   
@@ -194,6 +213,20 @@ server <- function(input, output, session) {
         labs(title = "Temperatura ",
              x = "Cas",
              y = ~degree~"C")
+    })
+  }
+  
+  update_graph_hr <- function(){
+    # Function that update plot on site Preveri srcni utrip.
+    
+    output$plotHR <- renderPlot({
+      ggplot(data = df$hr_plot) +
+        geom_smooth(aes(x=time, y=hr), span=0.3, color="green", size=1, alpha=1) +
+        geom_line(aes(x=time, y=hr), color="black", alpha=0.33) +
+        theme_bw() +
+        labs(title = "Srcni utrip ",
+             x = "Cas",
+             y = "Povprecni srcni utrip")
     })
   }
   
@@ -256,7 +289,7 @@ server <- function(input, output, session) {
     # Functions, that tidy uploaded data of phy measurments..
     
     time_raw <- untidy_data[1, ] # Reading time.
-    freq <- untidy_data[2, ] # Reading frequency.
+    freq <- as.integer(untidy_data[2, ]) # Reading frequency.
     nh_eda <- untidy_data[-c(1,2), ] # Removing first two rows.
     
     # Converting and making sequence of time stamps.
@@ -264,7 +297,7 @@ server <- function(input, output, session) {
     df$day <- day(time[1])
     df$month <- month(time[1])
     df$year <- year(time[1])
-    time_seq <- seq.POSIXt(as.POSIXct(time), as.POSIXct((time_raw + length(nh_eda)/freq), origin="1970-01-01", tz = "Prague"), units = "seconds", by = .25)
+    time_seq <- seq.POSIXt(as.POSIXct(time), as.POSIXct((time_raw + length(nh_eda)/freq), origin="1970-01-01", tz = "Prague"), units = "seconds", by = 1/freq)
     
     
     # Removing last rows if columns are not the same size.
@@ -273,11 +306,12 @@ server <- function(input, output, session) {
       time_seq <- time_seq[1:(length(time_seq)-k)]
     }
     
-    # Merging data (timestamps and EDA)
+    # Merging data (timestamps and phy)
     tidy_data <- data.frame(time_seq, nh_eda) 
     names(tidy_data) <- c("time", measure)
     return(tidy_data)
   }
+  
 
   observeEvent(input$upload_data, {
     
@@ -285,19 +319,23 @@ server <- function(input, output, session) {
     req(input$file_zip)
     data_eda <- read.csv(unz(input$file_zip$datapath, "EDA.csv"), header = F) # read.csv(input$file_phy$datapath, header = F)
     data_temp <- read.csv(unz(input$file_zip$datapath, "TEMP.csv"), header = F)
+    data_hr <- read.csv(unz(input$file_zip$datapath, "HR.csv"), header = F)
     
     # Tidying data.
     df$eda <- tidy_uploaded_data(data_eda, "eda")
     df$temp <- tidy_uploaded_data(data_temp, "temp")
     df$ec <- tidy_uploaded_data(data_eda, "eda")
+    df$hr <- tidy_uploaded_data(data_hr, "hr")
     
     # Plot variables
     df$eda_plot <- df$eda
     df$temp_plot <- df$temp
+    df$hr_plot <- df$hr
     
     # Updating plot on Inspect EDA
     update_graph_eda()
     update_graph_temp()
+    update_graph_hr()
     
     # Updating slider on Inspect EDA
     # We always have to update sliders after we upload data. Before some dummy values.
@@ -313,6 +351,13 @@ server <- function(input, output, session) {
                               max = df$temp[length(df$temp$time),1], 
                               value = c(df$temp[1,1],
                                         df$temp[length(df$temp$time),1]),
+                              timeFormat = "%H:%M"))
+    
+    observe(updateSliderInput(session, "time_hr", 
+                              min = df$hr[1,1], 
+                              max = df$hr[length(df$hr$time),1], 
+                              value = c(df$hr[1,1],
+                                        df$hr[length(df$hr$time),1]),
                               timeFormat = "%H:%M"))
     
     observe(updateSelectInput(session, "in_game", 
@@ -359,6 +404,15 @@ server <- function(input, output, session) {
     df$temp_plot <- df$temp[
       row.names(df$temp[which(df$temp$time == min),]):row.names(df$temp[which(df$temp$time == max),]),]
     update_graph_temp()
+  })
+  
+  observeEvent(input$update_hr, {
+    # Button on Preveri Temperaturo
+    min <- input$time_hr[1]
+    max <- input$time_hr[2]
+    df$hr_plot <- df$hr[
+      row.names(df$hr[which(df$hr$time == min),]):row.names(df$hr[which(df$hr$time == max),]),]
+    update_graph_hr()
   })
   
   # [S] Chess ----
