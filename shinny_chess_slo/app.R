@@ -16,7 +16,7 @@ options(encoding="utf-8")
 # Defined UI for the website.
 ui <- navbarPage(theme = shinytheme("simplex"),"Navigacija",
     
-                 
+
     #  Upload data ----
     tabPanel("Nalozi podatke",
              # Side bar
@@ -30,109 +30,57 @@ ui <- navbarPage(theme = shinytheme("simplex"),"Navigacija",
                fileInput("file_zip", "File input (zip):", 
                          multiple = FALSE,
                          accept = c(".zip")),
-               actionButton("upload_data", "Podatke poslji v obdelavo")
+               actionButton("upload_data", "Podatke poslji v obdelavo"),
+               hr(),
+               helpText("Izberi partijo izbrano kolo"),
+               selectInput("in_game", "Sahovska partija", c("None"), selectize = FALSE),
+               actionButton("upload_game", "Nalozi partijo"),
+               hr()
              ),
              
              # Main panel
              mainPanel(
                h1("O programu"),
                h3("Info"),
-               p("S programom, lahko preverite svoje fizioloske odzive za izbrano sahovsko partijo. Vsi fizioloski podatki (EDA, temperatura in srcni utrip) so shranjeni v ''.zip'' datoteki, ki vam je bila poslana preko elektronske poste. Pomembno je, da izberete ustrezno kolo in partijo."),
+               p("S programom, lahko preverite svoje fizioloske odzive za izbrano sahovsko partijo. Vsi fizioloski podatki (EDA, temperatura in povprecni srcni utrip) so shranjeni v ''.zip'' datoteki, ki vam je bila poslana preko elektronske poste. Pomembno je, da izberete ustrezno kolo in partijo."),
                p("\n"),
                h3("Kaj je EDA ali elektrodermalna aktivnost?"),
-               p("Elektrodermalna aktivnost se nanasa na elektricne spremembe (prevodnost), ki je merjena na povrsini koze. Prevodnost koze se stalno spremenija, do vecjih sprememb pa pride takrat, kadar smo custveno vzburjeni, smo kognitivno obremenjeni ali tudi pri fizicnem naporu. Mozgani takrat posljejo kozi signal, naj poveca raven znojenja. In, kot zanimivost: cetudi morda ne cutite nobenega znojenja na povrsini koze se elektricna prevodnost poveca na merljivo pomemben nacin (prejeto s spletne strani Empatica).")
+               p("Elektrodermalna aktivnost se nanasa na elektricne spremembe (prevodnost), ki je merjena na povrsini koze. Prevodnost koze se stalno spremenija, do vecjih sprememb pa pride, kadar smo custveno vzburjeni, kognitivno obremenjeni ali pri fizicnem naporu. V takih primerih mozgani posljejo ''kozi'' signal, naj poveca raven znojenja, s cimer se poveca elektricna prevodnost koze na merljivo pomemben nacin (spletna strana Empatica).")
                ),
              tableOutput("zipped")
     ),
-    
 
+
+  
     # Inspect EDA ----
-    tabPanel("Preveri EDA",
-             # Main panel
-             verticalLayout(
-               titlePanel("Preveri EDA"),
-               plotOutput("plotEDA"),
-               wellPanel(
-                 sliderInput("time_eda", 
-                             label = h3("Cas"), 
-                             min = as.POSIXct("15:00", format = "%H:%M"), 
-                             max = as.POSIXct("23:00", format = "%H:%M"), 
-                             value = c(as.POSIXct("17:15", format = "%H:%M"), 
-                                       as.POSIXct("17:15", format = "%H:%M")),
-                             timeFormat = "%H:%M"),
-                 actionButton("update_eda", align="center", "Osvezi pogled")
-               )
-             )
-             ),
-    
-    tabPanel("Preveri temperaturo",
-             # Main panel
-             verticalLayout(
-               titlePanel("Preveri temperaturo"),
-               plotOutput("plotTEMP"),
-               wellPanel(
-                 sliderInput("time_temp", 
-                             label = h3("Cas"), 
-                             min = as.POSIXct("15:00", format = "%H:%M"), 
-                             max = as.POSIXct("23:00", format = "%H:%M"), 
-                             value = c(as.POSIXct("17:15", format = "%H:%M"), 
-                                       as.POSIXct("17:15", format = "%H:%M")),
-                             timeFormat = "%H:%M"),
-                 actionButton("update_temp", align="center", "Osvezi pogled")
-               )
-             )
-    ),
-    
-    tabPanel("Preveri srcni utrip",
-             # Main panel
-             verticalLayout(
-               titlePanel("Preveri srcni utrip"),
-               plotOutput("plotHR"),
-               wellPanel(
-                 sliderInput("time_hr", 
-                             label = h3("Cas"), 
-                             min = as.POSIXct("15:00", format = "%H:%M"), 
-                             max = as.POSIXct("23:00", format = "%H:%M"), 
-                             value = c(as.POSIXct("17:15", format = "%H:%M"), 
-                                       as.POSIXct("17:15", format = "%H:%M")),
-                             timeFormat = "%H:%M"),
-                 actionButton("update_hr", align="center", "Osvezi pogled")
-               )
-             )
-    ),
-    
-    
-    
-    # Chess ----
-    tabPanel("Sah",
-             # Side bar
-             sidebarPanel(
-               helpText("Izberi partijo izbrano kolo"),
-               selectInput("in_game", "Sahoska partija", c("None"), selectize = FALSE),
-               actionButton("upload_game", "Nalozi partijo"),
-               hr(),
-               helpText("Premakni se na predhodno potezo."),
-               actionButton("previous_move", "Premakni se potezo nazaj"),
-               helpText("Premakni se na naslednjo potezo."),
-               actionButton("next_move", "Premakni se potezo naprej")
-               ),
-             
-             mainPanel(
-               h1("Sahovska igra: "),
-               textOutput("o_game"),
-               hr(),
-               p("Trenutni pogled: "),
-               chessboardjsOutput('board', width = 420)
-             )
-    ),
+tabPanel("Preveri fizioloske odzive",
+verticalLayout(
+  titlePanel("Fizioloski odzivi"),
+  wellPanel(
+    sliderInput("time_eda", 
+                label = h3("Cas"), 
+                min = as.POSIXct("15:00", format = "%H:%M", tz="Etc/GMT-1"), 
+                max = as.POSIXct("23:00", format = "%H:%M", tz="Etc/GMT-1"), 
+                value = c(as.POSIXct("17:15", format = "%H:%M", tz="Etc/GMT-1"), 
+                          as.POSIXct("17:15", format = "%H:%M", tz="Etc/GMT-1")),
+                timeFormat = "%H:%M"),
+    actionButton("update_eda", align="center", "Osvezi pogled")
+  ),
+  plotOutput("plotEDA",  height = "280px", width='100%'),
+  plotOutput("plotTEMP", height = "280px", width='100%'),
+  plotOutput("plotHR", height = "280px", width='100%')
+  
+)
+),
     # EDA + Chess ----
     tabPanel("EDA + Sah",
              fluidRow(
                column(6, align="center",
-                      "EDA (trenutno je omogoceno zgolj za kola: 1, 5, 8, 9)"
+                      textOutput("o_moves")
                ),
+               
                column(6,align="center",
-                      "Sahovska poteza "
+                      textOutput("o_game")
                )
              ),
              fluidRow(
@@ -145,8 +93,24 @@ ui <- navbarPage(theme = shinytheme("simplex"),"Navigacija",
              ),
              fluidPage(
                fluidRow(
-                 column(6, align="center", plotOutput("plotEC")),
-                 column(6, align="center", chessboardjsOutput('boardEC', width = 360)))
+                 column(6, align="center", 
+                        tabsetPanel(
+                          tabPanel("EDA", 
+                                   plotOutput("plotEC")
+                                   ),
+                          tabPanel("Temperatura", 
+                                   plotOutput("plotECtemp")
+                                   ),
+                          tabPanel("Srcni utrip", 
+                                   plotOutput("plotEChr")
+                          )
+                        )
+                        
+                        ),
+                 column(6, align="center",
+                   textOutput("ticktack"),
+                   hr(),
+                   chessboardjsOutput('boardEC', width = 360)))
             ),
             fluidRow(
               column(6, align="right",
@@ -163,8 +127,8 @@ ui <- navbarPage(theme = shinytheme("simplex"),"Navigacija",
     tabPanel("O eksperimentu",
              mainPanel(
                h1("O eksperimentu"),
-               p("Eksperiment predstavlja merjenje fizioloskih odzivov sahista med sahosvko partijo.  Te podatke si n.pr. zelimo korelirati s sahovskimi polozaji, casom ure, itn. in tudi sklepati o stresu, ki ga je posameznik dozivljal v danem trenutku, saj je znano, da je povecan EDA odziv povezan s stresom in kognitivno obremenitijo. V kolikor imate dodatna vprasanja eksperimentu ali potrebujete pomoc pri aplikaciji mi prosim posljite sporocilo po e-posti. Poskusal vam bom odgovoriti v najboljsi moci."),
-               p("Pravtako bi se ob tej priloznosti rad zahvalil: vam udelezencem, Ivan Bratko (mentor), Jakob Valic in Andreja Dobrovoljc."),
+               p("Eksperiment predstavlja merjenje fizioloskih odzivov sahista med sahosvko partijo.  Vase (fizioloske) podatke bomo v prihodnosti analizirali in korelirali s sahovskimi polozaji, casom ure, itn. in sklepali o stresu, ki ga je posameznik dozivljal v danem trenutku, saj je znano, da je povecan EDA odziv povezan s stresom in kognitivno obremenitijo. V kolikor imate dodatna vprasanja eksperimentu ali potrebujete pomoc pri aplikaciji mi prosim posljite sporocilo po e-posti. Poskusal vam bom odgovoriti v najboljsi moci."),
+               p("Ob tej priloznosti bi se tudi ze rad zahvalil: vam udelezencem, Ivan Bratko (mentor), Jakob Valic in Andreja Dobrovoljc."),
                p(" "),
                p("Matej Mencin")
              ))
@@ -174,17 +138,22 @@ ui <- navbarPage(theme = shinytheme("simplex"),"Navigacija",
 # Define server logic ----
 server <- function(input, output, session) {
 
-  
+  output$boardEC <- renderChessboardjs({
+    # Chess board on EDA + Sah
+    
+    chssfen <- Chess$new()
+    chessboardjs(toString(chssfen$fen()))
+  })
   
   # [S] Reactive variables ----
   # Reactive variables are global variables.
   
   df <- reactiveValues(
     pgn = NULL, game = NULL, play = NULL, move = NULL,
-    eda = NULL, temp = NULL, eda_plot = NULL, temp_plot = NULL,
-    ec_plot = NULL, ec=NULL, playEC = NULL, moveEC = NULL, 
-    time_stamps = NULL, day = NULL, month = NULL, year = NULL,
-    indeks = NULL, hr = NULL, hr_plot = NULL) 
+    eda = NULL, temp = NULL, eda_plot = read.csv(text="time,eda"), temp_plot = read.csv(text="time,temp"),
+    ec_plot = read.csv(text="time,hr"), ec=NULL, playEC = NULL, moveEC = NULL, 
+    time_stamps = NULL, day = NULL, month = NULL, year = NULL, chess_time = NULL,
+    indeks = NULL, hr = NULL, hr_plot = read.csv(text="time,hr")) 
 
   # [S] Functions used in server.func ----
   
@@ -193,12 +162,13 @@ server <- function(input, output, session) {
     
     output$plotEDA <- renderPlot({
     ggplot(data = df$eda_plot) +
-        geom_smooth(aes(x=time, y=eda), span=0.3, color="blue", size=1, alpha=1) +
-        geom_line(aes(x=time, y=eda), color="black", alpha=0.33) +
+        #geom_smooth(aes(x=time, y=eda), span=0.3, color="blue", size=1, alpha=1) +
+        geom_line(aes(x=time, y=eda), color="seagreen3", alpha=1) +
         theme_bw() +
         labs(title = "Electrodermal aktivnost (EDA) v microsiemens ("~mu~"S)",
              x = "Cas",
-             y = "EDA ("~mu~"V)")
+             y = "EDA ("~mu~"V)")+
+        scale_x_datetime(timezone="Etc/GMT-2")
     })
   }
   
@@ -207,12 +177,13 @@ server <- function(input, output, session) {
     
     output$plotTEMP <- renderPlot({
       ggplot(data = df$temp_plot) +
-        geom_smooth(aes(x=time, y=temp), span=0.3, color="red", size=1, alpha=1) +
-        geom_line(aes(x=time, y=temp), color="black", alpha=0.33) +
+        #geom_smooth(aes(x=time, y=temp), span=0.3, color="red", size=1, alpha=1) +
+        geom_line(aes(x=time, y=temp), color="orange2", alpha=1) +
         theme_bw() +
         labs(title = "Temperatura ",
              x = "Cas",
-             y = ~degree~"C")
+             y = ~degree~"C")+
+        scale_x_datetime(timezone="Etc/GMT-2")
     })
   }
   
@@ -221,12 +192,13 @@ server <- function(input, output, session) {
     
     output$plotHR <- renderPlot({
       ggplot(data = df$hr_plot) +
-        geom_smooth(aes(x=time, y=hr), span=0.3, color="green", size=1, alpha=1) +
-        geom_line(aes(x=time, y=hr), color="black", alpha=0.33) +
+        #geom_smooth(aes(x=time, y=hr), span=0.3, color="green", size=1, alpha=1) +
+        geom_line(aes(x=time, y=hr), color="tomato2", alpha=1) +
         theme_bw() +
         labs(title = "Srcni utrip ",
              x = "Cas",
-             y = "Povprecni srcni utrip")
+             y = "Povprecni srcni utrip")+
+        scale_x_datetime(timezone="Etc/GMT-2")
     })
   }
   
@@ -234,8 +206,7 @@ server <- function(input, output, session) {
   update_data_ec <- function(a){
     # Function that UPDATE DATA for plot on site EDA + Sah
     
-    # print(length(df$time_stamps))
-    # print(df$moveEC-1)
+
     if (length(df$time_stamps) < (df$moveEC-1)) {
       t1 <- df$time_stamps[length(df$time_stamps)]  
     } else {
@@ -257,15 +228,16 @@ server <- function(input, output, session) {
     if(a != 0){
 
       difference <- as.integer(as.integer(seconds(t1)) - as.integer(t[indeks]))
-      # print(difference)
       indeks <- indeks + (difference * 4) 
       df$indeks <- indeks 
     }
     
-    # print(t[indeks])
-    # print(t1)
-    df$ec_plot <- df$ec[(df$indeks-240):(df$indeks+240),] # We always take [-240 to 240] from the move
+    indeks <- as.integer(indeks/4) - 10
     
+    # Chaning the plots.
+    df$ec_plot <- df$ec[(df$indeks-240):(df$indeks+240),] # We always take [-240 to 240] from the move
+    df$ec_plottemp <- df$temp[(df$indeks-240):(df$indeks+240),]
+    df$ec_plothr  <- df$hr[(indeks-60):(indeks+60),]
     
     return(0)
   }
@@ -276,13 +248,38 @@ server <- function(input, output, session) {
     
     output$plotEC <- renderPlot({
       ggplot(data = df$ec_plot) +
-        geom_line(aes(x=time, y=eda), color="red") +
-        geom_vline(xintercept=df$ec_plot$time[241]) +
-        labs(x = "Time",
-             y = "EDA ("~mu~"V)")
+        geom_line(aes(x=time, y=eda), color="seagreen3", size=1) +
+        geom_vline(xintercept=df$ec_plot$time[241], linetype="dotted", alpha=0.42, size=1) +
+        labs(x = "Cas (crtkana crta prikazuje cas ob premiku)",
+             y = "EDA ("~mu~"V)")+
+        scale_x_datetime(timezone="Etc/GMT-2")
         })
+  }
+  
+  update_graph_ec_temp <- function(){
+    # Function that update plot EDA + Sah.
     
-
+    output$plotECtemp <- renderPlot({ # OK
+      ggplot(data = df$ec_plottemp) + # OK
+        geom_line(aes(x=time, y=temp), color="orange2", size=1) + # OK
+        geom_vline(xintercept=df$ec_plottemp$time[241], linetype="dotted", alpha=0.42, size=1) + # OK
+        labs(x = "Cas (crtkana crta prikazuje cas ob premiku)",
+             y = ~degree~"C")+
+        scale_x_datetime(timezone="Etc/GMT-2")
+    })
+  }
+  
+  update_graph_ec_hr <- function(){
+    # Function that update plot EDA + Sah.
+    
+    output$plotEChr <- renderPlot({ # OK
+      ggplot(data = df$ec_plothr) + # OK
+        geom_line(aes(x=time, y=hr), color="tomato2", size=1) + # OK
+        geom_vline(xintercept=df$ec_plothr$time[61], linetype="dotted", alpha=0.42, size=1, label='Premik') + # OK
+        labs(x = "Cas (crtkana crta prikazuje cas ob premiku)",
+          y = "Povprecni srcni utrip")+
+        scale_x_datetime(timezone="Etc/GMT-2")
+    })
   }
   
   tidy_uploaded_data <- function(untidy_data, measure){
@@ -293,11 +290,11 @@ server <- function(input, output, session) {
     nh_eda <- untidy_data[-c(1,2), ] # Removing first two rows.
     
     # Converting and making sequence of time stamps.
-    time <- as.POSIXct(untidy_data[1,], origin="1970-01-01", tz = "Europe/Prague")
+    time <- as.POSIXct(untidy_data[1,], origin="1970-01-01", tz = "Etc/GMT-2")
     df$day <- day(time[1])
     df$month <- month(time[1])
     df$year <- year(time[1])
-    time_seq <- seq.POSIXt(as.POSIXct(time), as.POSIXct((time_raw + length(nh_eda)/freq), origin="1970-01-01", tz = "Prague"), units = "seconds", by = 1/freq)
+    time_seq <- seq.POSIXt(as.POSIXct(time), as.POSIXct((time_raw + length(nh_eda)/freq), origin="1970-01-01", tz = "Etc/GMT-2"), units = "seconds", by = 1/freq)
     
     
     # Removing last rows if columns are not the same size.
@@ -332,10 +329,6 @@ server <- function(input, output, session) {
     df$temp_plot <- df$temp
     df$hr_plot <- df$hr
     
-    # Updating plot on Inspect EDA
-    update_graph_eda()
-    update_graph_temp()
-    update_graph_hr()
     
     # Updating slider on Inspect EDA
     # We always have to update sliders after we upload data. Before some dummy values.
@@ -346,24 +339,17 @@ server <- function(input, output, session) {
                                         df$eda[length(df$eda$time),1]),
                               timeFormat = "%H:%M"))
     
-    observe(updateSliderInput(session, "time_temp", 
-                              min = df$temp[1,1], 
-                              max = df$temp[length(df$temp$time),1], 
-                              value = c(df$temp[1,1],
-                                        df$temp[length(df$temp$time),1]),
-                              timeFormat = "%H:%M"))
-    
-    observe(updateSliderInput(session, "time_hr", 
-                              min = df$hr[1,1], 
-                              max = df$hr[length(df$hr$time),1], 
-                              value = c(df$hr[1,1],
-                                        df$hr[length(df$hr$time),1]),
-                              timeFormat = "%H:%M"))
-    
     observe(updateSelectInput(session, "in_game", 
                               choices = sort(paste(df$pgn[,5], df$pgn[,6], sep = " - "))))
     
     })
+  # Updating plot on Inspect EDA
+
+  update_graph_eda()
+
+  update_graph_temp()
+
+  update_graph_hr()
   
   observeEvent(input$upload_data,{
     
@@ -380,11 +366,6 @@ server <- function(input, output, session) {
   
 
   
-  # [S] Table ----
-  
-  # Not used.
-  
-  
   # [S] EDA/TEMP ----
   
   observeEvent(input$update_eda, {
@@ -392,26 +373,27 @@ server <- function(input, output, session) {
     
     min <- input$time_eda[1]
     max <- input$time_eda[2]
+    
+    if (min == df$eda[1,1]){
+      df$hr_plot <- df$hr[
+        1:row.names(df$eda[which(df$eda$time == max),]),]
+    } else if (max == df$eda[length(df$eda$time),1]){
+      df$hr_plot <- df$hr[
+        row.names(df$hr[which(df$hr$time == min),]):length(df$hr$time),]
+    } else if ((min == df$eda[1,1]) & max == (df$eda[length(df$eda$time),1])){
+      df$hr_plot <- df$hr
+    } else{
+      df$hr_plot <- df$hr[
+        row.names(df$hr[which(df$hr$time == min),]):row.names(df$hr[which(df$hr$time == max),]),]
+    }
+    
     df$eda_plot <- df$eda[
       row.names(df$eda[which(df$eda$time == min),]):row.names(df$eda[which(df$eda$time == max),]),]
-    update_graph_eda()
-  })
-  
-  observeEvent(input$update_temp, {
-    # Button on Preveri Temperaturo
-    min <- input$time_temp[1]
-    max <- input$time_temp[2]
     df$temp_plot <- df$temp[
       row.names(df$temp[which(df$temp$time == min),]):row.names(df$temp[which(df$temp$time == max),]),]
+
+    update_graph_eda()
     update_graph_temp()
-  })
-  
-  observeEvent(input$update_hr, {
-    # Button on Preveri Temperaturo
-    min <- input$time_hr[1]
-    max <- input$time_hr[2]
-    df$hr_plot <- df$hr[
-      row.names(df$hr[which(df$hr$time == min),]):row.names(df$hr[which(df$hr$time == max),]),]
     update_graph_hr()
   })
   
@@ -427,19 +409,22 @@ server <- function(input, output, session) {
     iksi <- as.integer(row.names(df$pgn[which(df$pgn$White == tmp_string[1, 1]),]))
     iksi <- df$pgn$Round[iksi]
     iksi <- as.numeric(substr(iksi, 3, nchar(iksi)))
-    print(iksi)
+    # print(iksi)
     
-
+    
     # Loading time stamps.
     data_dir <- paste("./data/round", as.character(input$round_pgn) ,".csv", sep="")
-    print(data_dir)
     data_time_stamps <- read.csv(file = data_dir, header = TRUE, sep = ";")
-
+    
+    # Loading chess time.
+    data_dir <- paste("./data/round", as.character(input$round_pgn) ,"-ctimes.csv", sep="")
+    data_chess_time <- read.csv(file = data_dir, header = TRUE, sep = ";")
+    
     
     x <- iksi # Change
     time_stamps <- matrix(unlist(strsplit(as.character(data_time_stamps$time[x]), ";")))
-    time_stamps <- as.POSIXct(time_stamps, origin="1970-01-01", format="%H:%M:%S", tz = "Europe/Prague")
-
+    time_stamps <- as.POSIXct(time_stamps, origin="1970-01-01", format="%H:%M:%S", tz = "Etc/GMT-2")
+    
     for (i in 1:length(time_stamps)){
       # time_stamps[i] <- as.POSIXct(time_stamps[i],format="%H:%M:%S")
       day(time_stamps[i]) <- df$day
@@ -447,6 +432,17 @@ server <- function(input, output, session) {
       year(time_stamps[i]) <- df$year
     }
     df$time_stamps <- time_stamps
+    
+    x <- iksi # Change
+    chess_time <- matrix(unlist(strsplit(as.character(data_chess_time$time[x]), ";")))
+    chess_time <- as.POSIXct(chess_time, origin="1970-01-01", format="%H:%M:%S", tz = "")
+    
+    for (i in 1:length(chess_time)){
+      day(chess_time[i]) <- df$day
+      month(chess_time[i]) <- df$month
+      year(chess_time[i]) <- df$year
+    }
+    df$chess_time <- chess_time
     
     
     # Loading chess data
@@ -476,7 +472,9 @@ server <- function(input, output, session) {
     df$indeks <- 1
     update_data_ec(0) # A variable 0 means that we are looking next move.
     update_graph_ec()
-
+    update_graph_ec_temp()
+    update_graph_ec_hr()
+    
     
     output$o_game <- renderText({
       # Text on on Sah (Main window)
@@ -485,11 +483,29 @@ server <- function(input, output, session) {
             " (crni).")
     })
     
-    output$board <- renderChessboardjs({
-      # Chess board on Sah
-      
-      chessboardjs(toString(df$game$fen()))
+    output$o_moves <- renderText({
+      # Text on on Sah (Main window)
+      paste("Fizioloski odzivi za potezo. (", 
+            strftime(df$time_stamps[df$moveEC-1], format = "%H:%M:%S", tz="Etc/GMT-2"),")")
     })
+    
+    output$ticktack <- renderText({
+      # Text on on Sah (Main window)
+      if((df$moveEC-1) == 1){
+        df$belicas <- strftime(df$chess_time[df$moveEC-1], format = "%H:%M:%S")
+        df$crnicas <- strftime(df$chess_time[df$moveEC-1], format = "%H:%M:%S")
+      }
+      
+      if((df$moveEC-1) %% 2 == 0){
+        df$belicas <- strftime(df$chess_time[df$moveEC], format = "%H:%M:%S")
+      }
+      else{
+        df$crnicas <- strftime(df$chess_time[df$moveEC], format = "%H:%M:%S")
+      }
+      paste("Ura beli: ", 
+            df$belicas," - Ura crni: ", df$crnicas)
+    })
+    
     
     output$boardEC <- renderChessboardjs({
       # Chess board on EDA + Sah
@@ -499,33 +515,6 @@ server <- function(input, output, session) {
     })
   })
   
-  observeEvent(input$next_move,{
-    # Button on Sah
-    print(df$move)
-    if(df$move < dim(df$play)[1]){
-      df$move <- df$move + 1
-    }
-    chssfen <- Chess$new()
-    fen <- df$play[df$move,]
-    chssfen$load(toString(fen))
-    output$board <- renderChessboardjs({
-      chessboardjs(toString(chssfen$fen()))})
-    
-  })
-  
-  observeEvent(input$previous_move,{
-    # Button on Sah
-    
-    if(df$move > 2){
-      df$move <- df$move - 1
-    }
-    chssfen <- Chess$new()
-    fen <- df$play[df$move,]
-    chssfen$load(toString(fen))
-    output$board <- renderChessboardjs({
-      chessboardjs(toString(chssfen$fen()))})
-    
-  })
   
   observeEvent(input$nextEC,{
     # Button on EDA + Sah
@@ -535,13 +524,23 @@ server <- function(input, output, session) {
       df$moveEC <- df$moveEC + 1
       update_data_ec(1) # 1 = next move
       update_graph_ec()
+      update_graph_ec_temp()
+      update_graph_ec_hr()
     }
     chssfen <- Chess$new() # Creating an empty chess board
     fen <- df$playEC[df$moveEC,] # Setting up fen position.
     chssfen$load(toString(fen))  # Setting up fen position.
     output$boardEC <- renderChessboardjs({
       chessboardjs(toString(chssfen$fen()))})
+    #print(df$game$history(verbose = TRUE)[df$moveEC-2,6])
     
+    output$o_moves <- renderText({
+      # Text on on Sah (Main window)
+      paste("Fizioloski odzivi za potezo: ", as.integer((df$moveEC-1)/2), 
+            ".  ", (df$game$history(verbose = TRUE)[df$moveEC-2,6]), 
+            "   (", strftime(df$time_stamps[df$moveEC-1], format = "%H:%M:%S", tz="Etc/GMT-2"),")")
+    })
+    #print(df$chess_time[df$moveEC-1])
   })
   
   observeEvent(input$previousEC,{
@@ -551,14 +550,34 @@ server <- function(input, output, session) {
       df$moveEC <- df$moveEC - 1
       update_data_ec(-1) # -1 = previous move
       update_graph_ec()
+      update_graph_ec_temp()
+      update_graph_ec_hr()
     }
     chssfen <- Chess$new()
     fen <- df$playEC[df$moveEC,] # Setting up fen position.
     chssfen$load(toString(fen)) # Setting up fen position.
     output$boardEC <- renderChessboardjs({
       chessboardjs(toString(chssfen$fen()))})
+    #print(df$game$history(verbose = TRUE)[df$moveEC-2,6])
     
+    
+    output$o_moves <- renderText({
+      # Text on on Sah (Main window)
+      paste("Fizioloski odzivi za potezo: ", as.integer((df$moveEC-1)/2), 
+            ".  ", (df$game$history(verbose = TRUE)[df$moveEC-2,6]), 
+            "   (", strftime(df$time_stamps[df$moveEC-1], format = "%H:%M:%S", tz="Etc/GMT-2"),")")
+    })
+    
+    if(df$moveEC == 2){
+      output$o_moves <- renderText({
+        # Text on on Sah (Main window)
+        paste("Fizioloski odzivi za potezo (", 
+              strftime(df$time_stamps[df$moveEC-1], format = "%H:%M:%S", tz="Etc/GMT-2"),")")
+      })
+    }
+    #print(df$chess_time[df$moveEC-1])
   })
+  
   
 
 
