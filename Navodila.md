@@ -22,7 +22,7 @@ Na koncu je potrebno podatke poslati v obdelavo s klikom na gumb *"Podatke poslj
 
 - Zavihek *"Nalozi podatke"* omogoča, da podatke naložite v aplikacijo.
 
-- Zavihki *"Preveri EDA"*; "*Preveri temperaturo*"; *"Preveri srcni utrip*" omogoča spremljanje EDA odziva, temperature in srčnega utripa med šahovsko partijo. Izberete lahko tudi časovno okno prikaza podatkov.
+- Zavihek *"Preveri fizioloske odzive"* omogoča spremljanje EDA odziva, temperature in srčnega utripa med šahovsko partijo. Izberete lahko tudi časovno okno prikaza podatkov.
 
   
 
@@ -44,15 +44,8 @@ Na koncu je potrebno podatke poslati v obdelavo s klikom na gumb *"Podatke poslj
 
   
 
-- Zavihek *"Sah"* omogoča, da izberete ustrezno šahovsko partijo predhodno izbranega kola. V nadaljevanju se lahko premikate po posameznih potezah. <u>Ko bodo podatki uspešno naloženi se vam mora prikazati šahovnica, na kateri je zadnja poteza šahovske partije.</u>
 
-
-
-**Šah:**
-
-![1574882044423](sah.png)
-
-- Zavihek *"EDA + Sah"* omogoča vzporedno spremljanje šahovske partije z EDA odzivom.
+- Zavihek *"EDA + Sah"* omogoča vzporedno spremljanje šahovske partije z fiziološkimi odzivi.
 
 
 
@@ -62,7 +55,7 @@ Na koncu je potrebno podatke poslati v obdelavo s klikom na gumb *"Podatke poslj
 
 ## ! Opomba !
 
-V kolikor želite spremljati EDA in šah je nujno potrebno izbrati ustrezno partijo v zavihku *"Sah"* in jo naložiti v program s klikom na gumb *"Nalozi partijo"*.
+V kolikor želite spremljati EDA in šah je nujno potrebno izbrati ustrezno partijo in jo naložiti v program s klikom na gumb *"Nalozi partijo"*.
 
 
 
