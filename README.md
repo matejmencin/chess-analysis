@@ -1,2 +1,2 @@
-# Shinny R-website to inspect Chess and Phy Data.
+# Shinny R Website to inspect Chess+Phy Data.
 Author: Metij
